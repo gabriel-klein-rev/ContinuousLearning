@@ -3,7 +3,7 @@ spark = SparkSession.builder \
     .master("local") \
     .appName("pokemon") \
     .getOrCreate()
-sc = spark.sparkContext()
+sc = spark.sparkContext
 
 pokemon_df = spark.read \
     .option("header", True) \
@@ -14,4 +14,4 @@ pokemon_df.createOrReplaceTempView("pokemon")
 avgAttackDF = spark.sql("SELECT Generation, AVG(Attack) as `Average Attack` FROM pokemon GROUP BY Generation ORDER BY Generation")
 avgAttackDF.show()
 
-spark.close()
+avgAttackDF.coalesce(1).write.mode("overwrite").option("header", True).csv("s3a://continuouslearning/output")
